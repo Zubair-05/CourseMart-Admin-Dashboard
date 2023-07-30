@@ -13,8 +13,8 @@ const Navbar = () => {
   };
 
   const handleRoute = () => {
-    window.location.replace(`${BASE_URL}/courses`);
-    // window.open('http://localhost:5174/courses', '_blank');
+    // window.location.replace(``);
+    window.open('https://course-mart-user-dashboard-zubair05.vercel.app/', '_blank');
   }
   return (
     <nav className="flex items-center justify-between bg-gray-800 text-white py-4 px-6">
