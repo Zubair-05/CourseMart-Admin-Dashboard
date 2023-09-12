@@ -1,37 +1,57 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {BASE_URL} from '../../config'
+import { BASE_URL } from '../../config'
+import { courseState, loadingState } from "../store/course";
+import { useRecoilState, useRecoilValue } from "recoil";
+import CourseSkeleton from '../utils/CourseSkeleton';
+import Init from "../utils/Init";
 
 function ShowCourses() {
-  const [courses, setCourses] = useState([]);
+  const [courses, setCourses] = useRecoilState(courseState);
+  const [isLoading, setLoading] = useRecoilState(loadingState);
+  const Navigate = useNavigate();
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/");
-      return;
+      <Navigate to="/" />;
     }
-
+  }, []);
+  useEffect(() => {
+    setLoading(true);
     const getCourses = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/admin/courses`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        const data = await response.json();
-        console.log(`response from the server`);
-        console.log(data);
-        setCourses(data.courses);
-      } catch (error) {
-        console.log(error);
-      }
+        try {
+            const response = await fetch(`${BASE_URL}/admin/courses`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            const data = await response.json();
+            console.log(data);
+
+            setLoading(false);
+            setCourses(data.courses);
+        } catch (error) {
+            console.log(error);
+        }
     };
     getCourses();
-  }, []);
+}, [])
+  if (isLoading) {
+    return <CourseSkeleton />
+  }
+  // var publishedCourses = []; 
+
+  const publishedCourses = courses.filter(course => course.isPublished)
+
+  console.log('published courses are');
+  console.log(publishedCourses);
+
 
   const handleCourseDelete = async (courseId) => {
     try {
@@ -48,15 +68,18 @@ function ShowCourses() {
     }
   };
 
+
+
   return (
     <div className="container mx-auto">
+      {/* <Init /> */}
       <h1 className="text-3xl font-semibold text-center my-6">
         Knowledge is Power: Empower Others through Course Creation!
       </h1>
 
-      <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {courses.length > 0 ? (
-          courses.map((c) => (
+      <div className=" mx-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {publishedCourses.length > 0 ? (
+          publishedCourses.map((c) => (
             <Course
               key={c._id}
               courseId={c._id}

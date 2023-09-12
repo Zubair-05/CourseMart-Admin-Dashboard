@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {BASE_URL} from '../../config'
+import { useRecoilState } from 'recoil';
+import { courseState } from '../store/course';
 
 const UpdateCourse = () => {
+  const [courses, setCourses] = useRecoilState(courseState); 
   const navigate = useNavigate();
   const location = useLocation();
   const [course, setCourse] = useState({
@@ -42,6 +45,20 @@ const UpdateCourse = () => {
     const data = await response.json();
     if (data) {
       console.log(`inside update course ${data}`);
+      setCourses((oldCourses) => {
+        return oldCourses.map((c) => {
+          if (c._id === course.id) {
+            return {
+              ...c,
+              title: course.title,
+              description: course.description,
+              price: course.price,
+              imageLink: course.imageLink,
+            };
+          }
+          return c;
+        });
+      });
       navigate('/courses');
     }
     console.log(data);
@@ -51,7 +68,7 @@ const UpdateCourse = () => {
     <div className="container mx-auto mb-10">
       <h1 className="text-3xl font-bold my-6">Update Course Page</h1>
       <div>
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label htmlFor="title" className="block mb-2">
             Id:
           </label>
@@ -63,7 +80,7 @@ const UpdateCourse = () => {
             onChange={(e) => setCourse({ ...course, id: e.target.value })}
             className="w-full p-2 border border-gray-300 rounded"
           />
-        </div>
+        </div> */}
         <div className="mb-4">
           <label htmlFor="title" className="block mb-2">
             Title:

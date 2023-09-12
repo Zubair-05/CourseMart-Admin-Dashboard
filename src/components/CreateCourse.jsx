@@ -1,33 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, NavLink, useNavigate } from "react-router-dom";
-import {BASE_URL} from '../../config'
+import { BASE_URL } from '../../config'
+import { useRecoilState } from "recoil";
+import { courseState } from "../store/course";
 
 function CreateCourse() {
+  const [courses, setCourses] = useRecoilState(courseState);
   const [courseData, setCourseData] = useState({
     title: "",
     description: "",
     price: 1200,
     imageLink: "",
+    isPublished: false,
   });
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to='/' />
+  }
 
-  const handleSubmit = async () => {
-    const response = await fetch(`${BASE_URL}/admin/courses`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(courseData),
-    });
-    const data = await response.json();
-    if (data) {
-      console.log(`inside create course ${token}`);
-      navigate("/courses");
+  const handleSubmit = async (isPublished) => {
+    const url = `${BASE_URL}/admin/courses`;
+    const requestData = { ...courseData, isPublished };
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (data.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/');
+      }
+      setCourses((oldCart) => {
+        return [...oldCart, data];
+      });
+      if(isPublished) navigate('/courses');
+      else navigate('/saved-courses');
+    } catch (error) {
+      console.log(error);
     }
-    console.log(data);
   };
+
+  const handlePublish = () => {
+    handleSubmit(true);
+  };
+
+  const handleSave = () => {
+    handleSubmit(false);
+  };
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -44,7 +73,7 @@ function CreateCourse() {
   };
 
   return (
-    <div className="max-w-lg mx-auto my-9">
+    <div className="max-w-lg mx-2 sm:mx-auto  my-9">
       <h1 className="text-4xl font-semibold text-center my-3 mb-6">Create A New Course</h1>
       <div className="space-y-4">
         <div>
@@ -115,10 +144,16 @@ function CreateCourse() {
         )}
 
         <button
-          onClick={handleSubmit}
-          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
+          onClick={handlePublish}
+          className="bg-green-500 text-white py-2 px-4 mr-2 rounded hover:bg-green-600 transition-colors"
         >
-          Create Course
+          Publish
+        </button>
+        <button
+          onClick={handleSave}
+          className="bg-blue-500 text-white py-2 px-4 mx-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          Save
         </button>
       </div>
 
@@ -130,3 +165,60 @@ function CreateCourse() {
 }
 
 export default CreateCourse;
+
+
+
+
+// useEffect(() => {
+//   const f = async () => {
+//     const response = await fetch(`${BASE_URL}/admin/courses`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//       body: JSON.stringify(courseData),
+//     });
+//     console.log('courseData');
+//     console.log(courseData);
+//     const data = await response.json();
+//     if (data) {
+//       console.log(`inside create course ${token}`);
+//     }
+//     console.log(data);
+//   }
+//   if (courseData.isPublished) {
+//     f();
+//     setCourses((oldCart) => {
+//       return [...oldCart, courseData];
+//     });
+//     navigate("/courses");
+//   }
+// }, [courseData.isPublished])
+
+
+// const handlePublish = async () => {
+//   setCourseData({ ...courseData, isPublished: true });
+// };
+
+
+// const handleSave = async () => {
+//   // setCourseData({ ...courseData, isPublished: false });
+//   const response = await fetch(`${BASE_URL}/admin/courses`, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${token}`,
+//     },
+//     body: JSON.stringify(courseData),
+//   });
+//   const data = await response.json();
+//   if (data) {
+//     console.log(`inside create course ${token}`);
+//     setCourses((oldCart) => {
+//       return [...oldCart, courseData];
+//     });
+//     navigate("/saved-courses");
+//   }
+//   console.log(data);
+// };

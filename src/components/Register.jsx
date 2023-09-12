@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {BASE_URL} from '../../config'
+import { useSetRecoilState } from "recoil";
 
 function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
-
+  
   const handleSubmit = async () => {
     // e.preventDefault();
     const response = await fetch(`${BASE_URL}/admin/signup`, {

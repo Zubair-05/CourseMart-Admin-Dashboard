@@ -5,16 +5,17 @@ import CreateCourse from './components/CreateCourse';
 import Register from './components/Register';
 import ShowCourses from './components/ShowCourses';
 import UpdateCourse from './components/UpdateCourse';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-// This file shows how you can do routing in React.
-// Try going to /login, /register, /about, /courses on the website and see how the html changes
-// based on the route.
-// You can also try going to /random and see what happens (a route that doesnt exist)
+import Navbar from './utils/Navbar';
+import Footer from './utils/Footer';
+import Profile from './components/Profile';
+import UpdateProfile from './components/UpdateProfile';
+import SavedCourses from './components/SavedCourses';
+import Init from './utils/Init';
+
 function App() {
-    // const token = localStorage.getItem('token');
     return (
         <Router>
+            {/* <Init/> */}
             <Navbar />
             <Routes>
                 <Route path="/" element={<Landing />} />
@@ -23,6 +24,9 @@ function App() {
                 <Route path="/create" element={<CreateCourse />} />
                 <Route path="/courses" element={<ShowCourses />} />
                 <Route path="/update/:id" element={<UpdateCourse />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/update-profile" element={<UpdateProfile />} />
+                <Route path="/saved-courses" element={<SavedCourses />} />
             </Routes>
             <Footer /> 
         </Router>

@@ -1,12 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {BASE_URL} from '../../config'
+import { BASE_URL } from '../../config'
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const navigate = useNavigate();
+  const Navigate = useNavigate();
+
+  useEffect(() => {
+    const user = localStorage.getItem("token");
+    if (user) {
+      navigate("/courses");
+      return;
+    }
+  })
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const response = await fetch(`${BASE_URL}/admin/login`, {
@@ -25,6 +34,7 @@ function Login() {
       alert("Invalid credentials");
     }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">

@@ -3,6 +3,8 @@ import { NavLink, Navigate } from "react-router-dom";
 import {BASE_URL} from '../../config'
 
 function Landing() {
+
+
   const user = localStorage.getItem("token");
   if (user) {
     return <Navigate to="/courses" />;
